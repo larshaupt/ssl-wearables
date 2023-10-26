@@ -3,9 +3,9 @@
 # 1. Keep subjects ['f1', 'f2', 'f3', 'm1', 'm2', 'm3', 'm4']
 # 2. Keep only ['climb_stairs','drink_glass', 'pour_water', 'walk', 'getup_bed']
 data_root: C:\Code\thesis\ext\ssl-wearables\data\apple_30hz
-X_path: "${data.data_root}/Xs.npy"
-Y_path:  "${data.data_root}/Ys.npy"
-PID_path:  "${data.data_root}/pids.npy"
+X_path: "${data.data_root}/Xm.npy"
+Y_path:  "${data.data_root}/Ym.npy"
+PID_path:  "${data.data_root}/pidm.npy"
 sample_rate: 30
 task_type: 'regress'
 output_size: 1

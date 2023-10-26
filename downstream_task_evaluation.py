@@ -16,7 +16,7 @@ import pathlib
 
 # SSL net
 from sslearning.models.accNet import cnn1, SSLNET, Resnet
-from sslearning.scores import classification_scores, classification_report
+from sslearning.scores import classification_scores, classification_report, regression_report
 import copy
 from sklearn import preprocessing
 from sslearning.data.data_loader import NormalDataset
@@ -403,7 +403,11 @@ def evaluate_mlp(X_feats, y, cfg, my_device, logger, groups=None):
         results.extend(result)
 
     pathlib.Path(cfg.report_root).mkdir(parents=True, exist_ok=True)
-    classification_report(results, cfg.report_path)
+
+    if cfg.data.task_type == 'classify':
+        classification_report(results, cfg.report_path)
+    else: #regression
+        regression_report(result, cfg.report_path)
 
 
 def train_test_rf(

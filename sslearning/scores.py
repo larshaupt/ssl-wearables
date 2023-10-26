@@ -3,6 +3,7 @@ import sklearn.metrics as metrics
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+import numpy as np
 
 
 def summarise_scores(scores, name=None, average=False):
@@ -40,6 +41,14 @@ def classification_scores(Y_test, Y_test_pred):
 
     return cohen_kappa, precision, recall, f1
 
+def regression_scores(Y_test, Y_test_pred):
+    mse = metrics.mean_squared_error(Y_test, Y_test_pred)
+    mae = metrics.mean_absolute_error(Y_test, Y_test_pred)
+
+    corr = np.corrcoef(Y_test, Y_test_pred)[0,1]
+    explained_var = metrics.explained_variance_score(Y_test, Y_test_pred)
+
+    return mse, mae, corr, explained_var
 
 def save_report(
     precision_list, recall_list, f1_list, cohen_kappa_list, report_path
