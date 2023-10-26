@@ -1,0 +1,17 @@
+# 31 subjects, different skin tones
+# Preprocessing done:
+# 1. Keep subjects ['f1', 'f2', 'f3', 'm1', 'm2', 'm3', 'm4']
+# 2. Keep only ['climb_stairs','drink_glass', 'pour_water', 'walk', 'getup_bed']
+data_root: C:\Code\thesis\ext\ssl-wearables\data\apple_30hz
+X_path: "${data.data_root}/Xs.npy"
+Y_path:  "${data.data_root}/Ys.npy"
+PID_path:  "${data.data_root}/pids.npy"
+sample_rate: 30
+task_type: 'regress'
+output_size: 1
+batch_size: 50
+held_one_subject_out: true
+weighted_loss_fn: false #  doesn't matter in regression
+dataset_name: 'apple'
+subject_count: -1
+ratio2keep: 1
