@@ -174,6 +174,7 @@ def setup_data(train_idxs, test_idxs, X_feats, Y, groups, cfg):
     )
 
     weights = []
+
     if cfg.data.task_type == "classify":
         weights = get_class_weights(Y_train)
     return train_loader, val_loader, test_loader, weights
@@ -213,13 +214,13 @@ def train_mlp(model, train_loader, val_loader, cfg, my_device, weights):
         train_losses = []
         train_acces = []
         for i, (my_X, my_Y) in enumerate(train_loader):
+            
             my_X, my_Y = Variable(my_X), Variable(my_Y)
             my_X = my_X.to(my_device, dtype=torch.float)
             if cfg.data.task_type == "regress":
                 true_y = my_Y.to(my_device, dtype=torch.float)
             else:
                 true_y = my_Y.to(my_device, dtype=torch.long)
-
             logits = model(my_X)
             loss = loss_fn(logits, true_y)
             loss.backward()
@@ -663,14 +664,14 @@ def load_weights(
     print("%d Weights loaded" % len(pretrained_dict))
 
 
-@hydra.main(config_path="conf", config_name="config_eva")
+@hydra.main(config_path="conf", config_name="config_eva", version_base='1.3.2')
 def main(cfg):
     """Evaluate hand-crafted vs deep-learned features"""
 
     logger = logging.getLogger(cfg.evaluation.evaluation_name)
     logger.setLevel(logging.INFO)
     now = datetime.now()
-    dt_string = now.strftime("%d-%m-%Y_%H:%M:%S")
+    dt_string = now.strftime("%d-%m-%Y_%H_%M_%S") # had to change this because in windows : in filename is not allowed
     log_dir = os.path.join(
         get_original_cwd(),
         cfg.evaluation.evaluation_name + "_" + dt_string + ".log",
@@ -698,6 +699,7 @@ def main(cfg):
 
     sample_rate = cfg.data.sample_rate
     task_type = cfg.data.task_type
+
     GPU = cfg.gpu
     if GPU != -1:
         my_device = "cuda:" + str(GPU)
@@ -799,7 +801,7 @@ def main(cfg):
         )
         # Original X shape: (1861541, 1000, 3) for capture24
         print("Original X shape:", X.shape)
-
+        
         input_size = cfg.evaluation.input_size
         if X.shape[1] == input_size:
             print("No need to downsample")

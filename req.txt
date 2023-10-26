@@ -40,7 +40,7 @@ jsonschema==3.2.0
 kiwisolver==1.3.0
 Markdown==3.3.2
 MarkupSafe==1.1.1
-matplotlib==3.2.1
+matplotlib
 mistune==0.8.4
 multidict==4.7.6
 nbclient==0.5.1
@@ -48,12 +48,12 @@ nbconvert==6.0.7
 nbformat==5.0.8
 nest-asyncio==1.4.1
 notebook==6.1.4
-numpy==1.18.1
+numpy
 oauthlib==3.1.0
 olefile==0.46
 omegaconf>=2.0.5
 packaging==20.4
-pandas==1.0.3
+pandas
 pandocfilters==1.4.2
 parso==0.7.0
 pexpect==4.8.0
@@ -81,8 +81,8 @@ QtPy==1.9.0
 requests==2.24.0
 requests-oauthlib==1.3.0
 rsa==4.6
-scikit-learn==0.24.2
-scipy==1.6.2
+
+scipy
 seaborn==0.11.0
 Send2Trash==1.5.0
 six==1.15.0
@@ -91,9 +91,9 @@ tensorboard-plugin-wit==1.8.0
 terminado==0.9.1
 testpath==0.4.4
 threadpoolctl==2.1.0
-torch==1.7.0
+torch
 torchsummary==1.5.1
-torchvision==0.8.1
+torchvision
 tornado==6.0.4
 traitlets==5.0.5
 transforms3d==0.3.1
@@ -106,7 +106,7 @@ widgetsnbextension==3.5.1
 yarl==1.6.2
 zipp==3.4.0
 pre-commit
-tqdm
+
 synapseclient
-actipy
+
 python-dotenv
