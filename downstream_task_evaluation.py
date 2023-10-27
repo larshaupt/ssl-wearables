@@ -346,7 +346,7 @@ def train_test_mlp(
     train_loader, val_loader, test_loader, weights = setup_data(
         train_idxs, test_idxs, X_feats, y, groups, cfg
     )
-    #train_mlp(model, train_loader, val_loader, cfg, my_device, weights)
+    train_mlp(model, train_loader, val_loader, cfg, my_device, weights)
 
     model = init_model(cfg, my_device)
 
@@ -357,7 +357,7 @@ def train_test_mlp(
     )
 
     if save_preds:
-        save_predictions(y_test, y_test_pred, pid_test, os.path.join(cfg.report_root, 'preds.csv'))
+        save_predictions(y_test, y_test_pred, pid_test, os.path.join(cfg.report_root, 'preds_{}.csv'))
 
     # save this for every single subject
     my_pids = np.unique(pid_test)
@@ -407,7 +407,8 @@ def evaluate_mlp(X_feats, y, cfg, my_device, logger, groups=None, save_preds=Fal
             my_device,
             labels=labels,
             encoder=le,
-            save_preds=save_preds
+            save_preds=save_preds,
+            pred_path = os.path.join(cfg.pred_path, f"{i}_pred.csv")
         )
         results.extend(result)
 
@@ -694,6 +695,8 @@ def main(cfg):
         cfg.evaluation.evaluation_name + "_" + dt_string + ".log",
     )
     cfg.model_path = os.path.join(get_original_cwd(), dt_string + "tmp.pt")
+    cfg.pred_path = os.path.join(get_original_cwd(), 'preds', dt_string)
+    os.makedirs(cfg.pred_path, exist_ok=True)
     fh = logging.FileHandler(log_dir)
     fh.setLevel(logging.INFO)
     logger.addHandler(fh)
