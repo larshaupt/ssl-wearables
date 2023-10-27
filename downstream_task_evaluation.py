@@ -16,7 +16,7 @@ import pathlib
 
 # SSL net
 from sslearning.models.accNet import cnn1, SSLNET, Resnet
-from sslearning.scores import classification_scores, classification_report, regression_report
+from sslearning.scores import classification_scores, classification_report, regression_report, regression_scores, save_predictions
 import copy
 from sklearn import preprocessing
 from sslearning.data.data_loader import NormalDataset
@@ -338,6 +338,7 @@ def train_test_mlp(
     my_device,
     labels=None,
     encoder=None,
+    save_preds=False
 ):
     model = setup_model(cfg, my_device)
     if cfg.is_verbose:
@@ -345,7 +346,7 @@ def train_test_mlp(
     train_loader, val_loader, test_loader, weights = setup_data(
         train_idxs, test_idxs, X_feats, y, groups, cfg
     )
-    train_mlp(model, train_loader, val_loader, cfg, my_device, weights)
+    #train_mlp(model, train_loader, val_loader, cfg, my_device, weights)
 
     model = init_model(cfg, my_device)
 
@@ -355,6 +356,9 @@ def train_test_mlp(
         model, test_loader, my_device, cfg
     )
 
+    if save_preds:
+        save_predictions(y_test, y_test_pred, pid_test, os.path.join(cfg.report_root, 'preds.csv'))
+
     # save this for every single subject
     my_pids = np.unique(pid_test)
     results = []
@@ -362,13 +366,15 @@ def train_test_mlp(
         subject_filter = current_pid == pid_test
         subject_true = y_test[subject_filter]
         subject_pred = y_test_pred[subject_filter]
-
-        result = classification_scores(subject_true, subject_pred)
+        if cfg.data.task_type == 'classify':
+            result = classification_scores(subject_true, subject_pred)
+        else:
+            result = regression_scores(subject_true, subject_pred)
         results.append(result)
     return results
 
 
-def evaluate_mlp(X_feats, y, cfg, my_device, logger, groups=None):
+def evaluate_mlp(X_feats, y, cfg, my_device, logger, groups=None, save_preds=False):
     """Train a random forest with X_feats and Y.
     Report a variety of performance metrics based on multiple runs."""
 
@@ -388,7 +394,9 @@ def evaluate_mlp(X_feats, y, cfg, my_device, logger, groups=None):
     folds = get_train_test_split(cfg, X_feats, y, groups)
 
     results = []
-    for train_idxs, test_idxs in folds:
+    for i, (train_idxs, test_idxs) in enumerate(folds):
+        if i > 0:
+            break
         result = train_test_mlp(
             train_idxs,
             test_idxs,
@@ -399,6 +407,7 @@ def evaluate_mlp(X_feats, y, cfg, my_device, logger, groups=None):
             my_device,
             labels=labels,
             encoder=le,
+            save_preds=save_preds
         )
         results.extend(result)
 
@@ -407,7 +416,7 @@ def evaluate_mlp(X_feats, y, cfg, my_device, logger, groups=None):
     if cfg.data.task_type == 'classify':
         classification_report(results, cfg.report_path)
     else: #regression
-        regression_report(result, cfg.report_path)
+        regression_report(result, cfg.report_path, logger=logger)
 
 
 def train_test_rf(
@@ -447,7 +456,10 @@ def train_test_rf(
         subject_true = Y_test[subject_filter]
         subject_pred = Y_test_pred[subject_filter]
 
-        result = classification_scores(subject_true, subject_pred)
+        if cfg.data.task_type == 'classify':
+            result = classification_scores(subject_true, subject_pred)
+        else:
+            result = regression_scores(subject_true, subject_pred)
         results.append(result)
 
     return results
@@ -673,19 +685,20 @@ def main(cfg):
     """Evaluate hand-crafted vs deep-learned features"""
 
     logger = logging.getLogger(cfg.evaluation.evaluation_name)
-    logger.setLevel(logging.INFO)
+    #logger.setLevel(logging.INFO)
     now = datetime.now()
     dt_string = now.strftime("%d-%m-%Y_%H_%M_%S") # had to change this because in windows : in filename is not allowed
+    dt_string = '26-10-2023_14_55_26'
     log_dir = os.path.join(
         get_original_cwd(),
         cfg.evaluation.evaluation_name + "_" + dt_string + ".log",
     )
     cfg.model_path = os.path.join(get_original_cwd(), dt_string + "tmp.pt")
-    fh = logging.FileHandler(log_dir)
-    fh.setLevel(logging.INFO)
-    logger.addHandler(fh)
+    #fh = logging.FileHandler(log_dir)
+    #fh.setLevel(logging.INFO)
+    #logger.addHandler(fh)
 
-    logger.info(str(OmegaConf.to_yaml(cfg)))
+    #logger.info(str(OmegaConf.to_yaml(cfg)))
     # For reproducibility
     np.random.seed(42)
     torch.manual_seed(42)
@@ -820,7 +833,7 @@ def main(cfg):
         print("X transformed shape:", X_downsampled.shape)
 
         print("Train-test Flip_net+MLP...")
-        evaluate_mlp(X_downsampled, Y, cfg, my_device, logger, groups=P)
+        evaluate_mlp(X_downsampled, Y, cfg, my_device, logger, groups=P, save_preds=True)
 
 
 if __name__ == "__main__":

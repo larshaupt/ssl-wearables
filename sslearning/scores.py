@@ -41,15 +41,6 @@ def classification_scores(Y_test, Y_test_pred):
 
     return cohen_kappa, precision, recall, f1
 
-def regression_scores(Y_test, Y_test_pred):
-    mse = metrics.mean_squared_error(Y_test, Y_test_pred)
-    mae = metrics.mean_absolute_error(Y_test, Y_test_pred)
-
-    corr = np.corrcoef(Y_test, Y_test_pred)[0,1]
-    explained_var = metrics.explained_variance_score(Y_test, Y_test_pred)
-
-    return mse, mae, corr, explained_var
-
 def save_report(
     precision_list, recall_list, f1_list, cohen_kappa_list, report_path
 ):
@@ -58,6 +49,18 @@ def save_report(
         "recall": recall_list,
         "f1": f1_list,
         "kappa": cohen_kappa_list,
+    }
+
+    df = pd.DataFrame(data)
+    df.to_csv(report_path, index=False)
+
+
+def save_report_regression(
+    r2_list, rmse_list, report_path
+):
+    data = {
+        "r2": r2_list,
+        "rmse": rmse_list,
     }
 
     df = pd.DataFrame(data)
@@ -85,18 +88,23 @@ def regression_scores(Y_test, Y_test_pred):
     return {"r2": r2, "rmse": rmse}
 
 
-def regression_report(results, logger):
+def regression_report(results, report_path,logger=None):
     # Collate metrics
     r2_list = [result["r2"] for result in results]
     rmse_list = [result["rmse"] for result in results]
 
-    logger.info(
-        "\nRegression scores:"
-        "\n R^2: "
-        + str(summarise_scores(r2_list, average=True).item())
-        + "\nRMSE: "
-        + str(summarise_scores(rmse_list, average=True).item())
+    save_report_regression(
+        r2_list, rmse_list, report_path
     )
+
+    if logger:
+        logger.info(
+            "\nRegression scores:"
+            "\n R^2: "
+            + str(summarise_scores(r2_list, average=True).item())
+            + "\nRMSE: "
+            + str(summarise_scores(rmse_list, average=True).item())
+        )
 
 
 class _ECELoss(nn.Module):
@@ -144,3 +152,11 @@ class _ECELoss(nn.Module):
                 )
 
         return ece
+
+
+def save_predictions(Y_test, Y_test_pred, Pid, save_path):
+    print(f'Saving to {save_path}')
+
+    df = pd.DataFrame({'Y_test': Y_test, 'Y_test_pred': Y_test_pred, 'Pid': Pid})
+    df.to_csv(save_path)
+
