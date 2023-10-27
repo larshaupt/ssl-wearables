@@ -10,7 +10,7 @@ sample_rate: 30
 task_type: 'regress'
 output_size: 1
 batch_size: 50
-held_one_subject_out: true
+held_one_subject_out: false
 weighted_loss_fn: false #  doesn't matter in regression
 dataset_name: 'apple'
 subject_count: -1

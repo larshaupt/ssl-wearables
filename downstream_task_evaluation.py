@@ -685,20 +685,20 @@ def main(cfg):
     """Evaluate hand-crafted vs deep-learned features"""
 
     logger = logging.getLogger(cfg.evaluation.evaluation_name)
-    #logger.setLevel(logging.INFO)
+    logger.setLevel(logging.INFO)
     now = datetime.now()
     dt_string = now.strftime("%d-%m-%Y_%H_%M_%S") # had to change this because in windows : in filename is not allowed
-    dt_string = '26-10-2023_14_55_26'
+    #dt_string = '26-10-2023_14_55_26'
     log_dir = os.path.join(
         get_original_cwd(),
         cfg.evaluation.evaluation_name + "_" + dt_string + ".log",
     )
     cfg.model_path = os.path.join(get_original_cwd(), dt_string + "tmp.pt")
-    #fh = logging.FileHandler(log_dir)
-    #fh.setLevel(logging.INFO)
-    #logger.addHandler(fh)
+    fh = logging.FileHandler(log_dir)
+    fh.setLevel(logging.INFO)
+    logger.addHandler(fh)
 
-    #logger.info(str(OmegaConf.to_yaml(cfg)))
+    logger.info(str(OmegaConf.to_yaml(cfg)))
     # For reproducibility
     np.random.seed(42)
     torch.manual_seed(42)
