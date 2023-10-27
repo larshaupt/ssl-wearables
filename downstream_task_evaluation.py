@@ -338,7 +338,8 @@ def train_test_mlp(
     my_device,
     labels=None,
     encoder=None,
-    save_preds=False
+    save_preds=False,
+    pred_path = ''
 ):
     model = setup_model(cfg, my_device)
     if cfg.is_verbose:
@@ -357,7 +358,7 @@ def train_test_mlp(
     )
 
     if save_preds:
-        save_predictions(y_test, y_test_pred, pid_test, os.path.join(cfg.report_root, 'preds_{}.csv'))
+        save_predictions(y_test, y_test_pred, pid_test, pred_path)
 
     # save this for every single subject
     my_pids = np.unique(pid_test)
@@ -684,7 +685,7 @@ def load_weights(
 @hydra.main(config_path="conf", config_name="config_eva", version_base='1.3.2')
 def main(cfg):
     """Evaluate hand-crafted vs deep-learned features"""
-
+    print(cfg)
     logger = logging.getLogger(cfg.evaluation.evaluation_name)
     logger.setLevel(logging.INFO)
     now = datetime.now()

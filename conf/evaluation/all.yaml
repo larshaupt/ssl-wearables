@@ -6,6 +6,7 @@ feat_random_cnn: false
 
 # trained networks
 model_path: /data/UKBB/SSL/day_sec_10k/logs/models
+pred_path: /data
 flip_net: false
 flip_net_ft: true
 flip_net_random_mlp: false
